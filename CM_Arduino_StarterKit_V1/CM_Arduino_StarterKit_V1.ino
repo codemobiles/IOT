@@ -12,12 +12,41 @@ int last_count = 0;
 volatile long lastStatusOccured = 0;
 boolean found = false;
 
-void setup()
-{
+void setup(){
+  
+    initialization();
+    initialDisplay();
+    
+}
+
+void loop(){
+  
+    readAnalogValue();
+    lcd.setCursor(12, 1);
+    lcd.print(" ");
+    lcd.setCursor(11, 1); 
+    lcd.print(counter);
+   
+    Serial.print("Analog Value = ");       
+    Serial.println(analogValue);
+    Serial.print("CM_Counter: ");
+    Serial.println(counter);             
+ 
+    delay(100);                             
+    value = analogValue;
+    
+}
+
+void initialization(){
+  
     Serial.begin(115200);      
     pinMode(LED_BUILTIN, OUTPUT);
     pinMode(IRsensor, INPUT_PULLUP); 
     attachInterrupt(digitalPinToInterrupt(IRsensor),interruptFunc,CHANGE);    
+    
+}
+
+void initialDisplay(){
   
     lcd.init();        
     lcd.backlight();
@@ -25,17 +54,18 @@ void setup()
     lcd.print("CodeMobiles");
     delay(1000);
     lcd.setCursor(0, 1);
-    lcd.print("Ready"); 
-    Serial.println("www.arduino.codemobiles.com");  
-    Serial.println("Infrared Counter Demo"); 
+    lcd.print("Ready");  
     delay(1000);
     lcd.setCursor(0, 1);
     lcd.print("CM_Counter: ");
+    Serial.println("www.arduino.codemobiles.com");  
+    Serial.println("Infrared Counter Demo"); 
+    
 }
 
-void loop()
-{
-   analogValue = analogRead(ANALOG_PIN);   
+void readAnalogValue(){
+
+  analogValue = analogRead(ANALOG_PIN);   
    if(analogValue>value+5 ){
         counter++;
    }else 
@@ -44,19 +74,7 @@ void loop()
           counter--;
         }
    } 
-   lcd.setCursor(12, 1);
-   lcd.print(" ");
-   lcd.setCursor(11, 1); 
-   lcd.print(counter);
-   
   
-  Serial.print("Analog input0 = ");       
-  Serial.println(analogValue);
-  Serial.print("CM_Counter: ");
-  Serial.println(counter);             
- 
-  delay(100);                             
-  value = analogValue;
 }
 
 void interruptFunc()
@@ -67,14 +85,14 @@ void interruptFunc()
     found = !found;
     if(found == true){
       counter++; 
-      
+  
       if (last_count != counter){
         Serial.print("CM_Counter: ");  
         Serial.println(counter);  
       }
+      
       last_count = counter;
     }
   }
   lastStatusOccured = fin;
 }
-
